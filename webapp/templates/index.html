@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DreamTracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <div class="bg-animation">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+            <div class="particles" id="particles"></div>
+        </div>
+        <div class="cursor-trail" id="cursorTrail"></div>
+
+        <div class="container">
+            <header class="header">
+                <div class="logo">
+                    <span class="logo-icon">&#9670;</span>
+                    <span class="logo-text">DreamTracker</span>
+                </div>
+                <div class="header-stats">
+                    <div class="streak-badge">
+                        <span class="streak-fire">&#9656;</span>
+                        <span id="streakCount">0</span> дн.
+                    </div>
+                </div>
+            </header>
+
+            <nav class="tabs">
+                <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <span class="tab-icon">&#9672;</span><span>Главная</span>
+                </button>
+                <button class="tab" data-tab="chart" onclick="switchTab('chart')">
+                    <span class="tab-icon">&#9680;</span><span>Диаграмма</span>
+                </button>
+                <button class="tab" data-tab="calendar" onclick="switchTab('calendar')">
+                    <span class="tab-icon">&#9723;</span><span>Календарь</span>
+                </button>
+                <button class="tab" data-tab="reviews" onclick="switchTab('reviews')">
+                    <span class="tab-icon">&#9678;</span><span>Отзывы</span>
+                </button>
+            </nav>
+
+            <!-- ═══════ ГЛАВНАЯ ═══════ -->
+            <section class="tab-content active" id="dashboard">
+                <div class="card goal-card">
+                    <div class="card-shine"></div>
+                    <div class="goal-header">
+                        <span class="goal-label">Твоя цель</span>
+                        <span class="goal-status" id="goalStatus">Активна</span>
+                    </div>
+                    <h2 class="goal-title" id="goalTitle">Нет активной цели</h2>
+                    <p class="goal-subtitle" id="goalSubtitle">Создай цель через бота</p>
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            <div class="progress-glow"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span class="progress-current" id="progressCurrent">0</span>
+                            <span class="progress-divider">/</span>
+                            <span class="progress-target" id="progressTarget">0</span>
+                            <span class="progress-unit" id="progressUnit">руб</span>
+                        </div>
+                        <div class="progress-percentage" id="progressPercentage">0%</div>
+                    </div>
+                    <div class="goal-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Дней осталось</span>
+                            <span class="meta-value" id="daysLeft">&mdash;</span>
+                        </div>
+                        <div class="meta-divider"></div>
+                        <div class="meta-item">
+                            <span class="meta-label">В день нужно</span>
+                            <span class="meta-value" id="perDay">&mdash;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn primary" onclick="openCheckin()">
+                        <span class="action-icon">&#9656;</span><span>Отметить день</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="openWish()">
+                        <span class="action-icon">&#9671;</span><span>Загадать желание</span>
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEarned">0</div>
+                        <div class="stat-label">Всего собрано</div>
+                        <div class="stat-bar"><div class="stat-bar-fill" id="totalBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeDays">0</div>
+                        <div class="stat-label">Активных дней</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestStreak">0</div>
+                        <div class="stat-label">Лучшая серия</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgPerDay">0</div>
+                        <div class="stat-label">Среднее в день</div>
+                    </div>
+                </div>
+
+                <div class="card wish-card" id="wishCard" style="display: none">
+                    <div class="wish-label">Загаданное желание</div>
+                    <p class="wish-text" id="wishText"></p>
+                    <div class="wish-hint">Я верю что ты сможешь</div>
+                </div>
+            </section>
+
+            <!-- ═══════ ДИАГРАММА ═══════ -->
+            <section class="tab-content" id="chart">
+                <div class="card chart-card">
+                    <canvas id="progressCanvas"></canvas>
+                    <div class="chart-stats" id="chartStats"></div>
+                </div>
+            </section>
+
+            <!-- ═══════ КАЛЕНДАРЬ ═══════ -->
+            <section class="tab-content" id="calendar">
+                <div class="card">
+                    <div class="calendar-header">
+                        <button class="cal-nav" onclick="prevMonth()">&#9666;</button>
+                        <h3 class="cal-month" id="calMonth"></h3>
+                        <button class="cal-nav" onclick="nextMonth()">&#9656;</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="cal-day-name">Пн</div><div class="cal-day-name">Вт</div>
+                        <div class="cal-day-name">Ср</div><div class="cal-day-name">Чт</div>
+                        <div class="cal-day-name">Пт</div><div class="cal-day-name">Сб</div>
+                        <div class="cal-day-name">Вс</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays"></div>
+                </div>
+
+                <div class="card day-detail" id="dayDetail" style="display: none">
+                    <div class="day-detail-header">
+                        <span class="day-detail-date" id="detailDate"></span>
+                        <button class="close-btn" onclick="closeDayDetail()">&#10005;</button>
+                    </div>
+                    <div class="day-detail-content">
+                        <div><span class="detail-label">Заработано</span><span class="detail-value" id="detailEarned">0</span></div>
+                        <div><span class="detail-label">Настроение</span><span class="detail-value" id="detailMood">&mdash;</span></div>
+                        <div id="detailNote" style="display: none"><span class="detail-label">Заметка</span><p id="detailNoteText"></p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════ ОТЗЫВЫ ═══════ -->
+            <section class="tab-content" id="reviews">
+                <div class="reviews-header">
+                    <h2 class="section-title">Истории успеха</h2>
+                    <p class="section-subtitle">Люди, которые добились своих целей</p>
+                </div>
+                <div class="reviews-stats">
+                    <div class="review-stat"><span class="review-stat-value">12,847</span><span class="review-stat-label">пользователей</span></div>
+                    <div class="review-stat"><span class="review-stat-value">8,234</span><span class="review-stat-label">целей достигнуто</span></div>
+                </div>
+                <div class="reviews-list" id="reviewsList"></div>
+                <div class="reviews-cta">
+                    <p>Твоя история может быть следующей</p>
+                    <button class="btn btn-primary" onclick="switchTab('dashboard')">Начать сейчас</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- ═══════ МОДАЛКИ ═══════ -->
+        <div class="modal" id="checkinModal" style="display: none">
+            <div class="modal-backdrop" onclick="closeCheckin()"></div>
+            <div class="modal-content">
+                <div class="modal-header"><h3>Отметь свой день</h3><button class="close-btn" onclick="closeCheckin()">&#10005;</button></div>
+                <div class="modal-body">
+                    <label class="input-label">Сколько ты сделал сегодня?</label>
+                    <div class="input-group">
+                        <input type="number" id="checkinAmount" class="input-field" placeholder="0">
+                        <span class="input-unit" id="checkinUnit">руб</span>
+                    </div>
+                    <label class="input-label">Заметка (необязательно)</label>
+                    <textarea id="checkinNote" class="input-field textarea" placeholder="Что было сегодня..."></textarea>
+                    <label class="input-label">Настроение</label>
+                    <div class="mood-selector">
+                        <button class="mood-btn" data-mood="1" onclick="selectMood(1)">1</button>
+                        <button class="mood-btn" data-mood="2" onclick="selectMood(2)">2</button>
+                        <button class="mood-btn" data-mood="3" onclick="selectMood(3)">3</button>
+                        <button class="mood-btn" data-mood="4" onclick="selectMood(4)">4</button>
+                        <button class="mood-btn selected" data-mood="5" onclick="selectMood(5)">5</button>
+                        <button class="mood-btn" data-mood="6" onclick="selectMood(6)">6</button>
+                        <button class="mood-btn" data-mood="7" onclick="selectMood(7)">7</button>
+                        <button class="mood-btn" data-mood="8" onclick="selectMood(8)">8</button>
+                        <button class="mood-btn" data-mood="9" onclick="selectMood(9)">9</button>
+                        <button class="mood-btn" data-mood="10" onclick="selectMood(10)">10</button>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-primary" onclick="submitCheckin()">Сохранить</button></div>
+            </div>
+        </div>
+
+        <div class="modal" id="wishModal" style="display: none">
+            <div class="modal-backdrop" onclick="closeWish()"></div>
+            <div class="modal-content">
+                <div class="modal-header"><h3>Загадай желание</h3><button class="close-btn" onclick="closeWish()">&#10005;</button></div>
+                <div class="modal-body">
+                    <label class="input-label">Чего ты хочешь достичь завтра?</label>
+                    <textarea id="wishInput" class="input-field textarea" placeholder="Я хочу..."></textarea>
+                </div>
+                <div class="modal-footer"><button class="btn btn-primary" onclick="submitWish()">Загадать</button></div>
+            </div>
+        </div>
+
+        <div class="bottom-spacer"></div>
+    </div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

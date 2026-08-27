@@ -1,0 +1,5 @@
+{
+  "name": "DreamTracker",
+  "description": "Telegram бот для достижения целей",
+  "python_version": "3.11"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "dreamtracker",
+  "version": "1.0.0",
+  "description": "Telegram бот для достижения целей",
+  "scripts": {
+    "start": "python main.py"
+  }
+}
